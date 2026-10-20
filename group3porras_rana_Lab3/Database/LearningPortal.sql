@@ -50,12 +50,12 @@ INSERT INTO Categories (CategoryName) VALUES
 -- PasswordHash values: register these users once through the app,
 -- then copy the generated hashes here so the script logins work.
 INSERT INTO Users (Username, Email, FirstName, LastName, PasswordHash, Role) VALUES
- ('jsmith',  'jsmith@centennial.ca',     'John',    'Smith',  '<hash>', 'Instructor'),
- ('alee',    'alee@centennial.ca',       'Anna',    'Lee',    '<hash>', 'Instructor'),
- ('mchen',   'mchen@centennial.ca',      'Michael', 'Chen',   '<hash>', 'Instructor'),
- ('cjones',  'cjones@my.centennial.ca',  'Cindy',   'Jones',  '<hash>', 'Student'),
- ('tlee',    'tlee@my.centennial.ca',    'Trevor',  'Lee',    '<hash>', 'Student'),
- ('hbrowns', 'hbrowns@my.centennial.ca', 'Howard',  'Browns', '<hash>', 'Student');
+ ('jsmith',  'jsmith@centennial.ca',     'John',    'Smith',  'AQAAAAIAAYagAAAAEBg232J21Bm7f4h+A6roKxzJhDi9ADMPf6D0EJaKBQKSTmMQCNinYtq/KOMx5h0dmA==', 'Instructor'),
+ ('alee',    'alee@centennial.ca',       'Anna',    'Lee',    'AQAAAAIAAYagAAAAEBg232J21Bm7f4h+A6roKxzJhDi9ADMPf6D0EJaKBQKSTmMQCNinYtq/KOMx5h0dmA==', 'Instructor'),
+ ('mchen',   'mchen@centennial.ca',      'Michael', 'Chen',   'AQAAAAIAAYagAAAAEBg232J21Bm7f4h+A6roKxzJhDi9ADMPf6D0EJaKBQKSTmMQCNinYtq/KOMx5h0dmA==', 'Instructor'),
+ ('cjones',  'cjones@my.centennial.ca',  'Cindy',   'Jones',  'AQAAAAIAAYagAAAAEBg232J21Bm7f4h+A6roKxzJhDi9ADMPf6D0EJaKBQKSTmMQCNinYtq/KOMx5h0dmA==', 'Student'),
+ ('tlee',    'tlee@my.centennial.ca',    'Trevor',  'Lee',    'AQAAAAIAAYagAAAAEBg232J21Bm7f4h+A6roKxzJhDi9ADMPf6D0EJaKBQKSTmMQCNinYtq/KOMx5h0dmA==', 'Student'),
+ ('hbrowns', 'hbrowns@my.centennial.ca', 'Howard',  'Browns', 'AQAAAAIAAYagAAAAEBg232J21Bm7f4h+A6roKxzJhDi9ADMPf6D0EJaKBQKSTmMQCNinYtq/KOMx5h0dmA==', 'Student');
 
 INSERT INTO LearningResources (Title, Description, CategoryID, AuthorID, CreatedDate, S3Key, FileName, ContentType, ViewCount) VALUES
  ('Intro to AWS S3',           'Buckets, objects and permissions',  1, 1, '2026-10-01', 'resources/intro-s3.pdf',          'intro-s3.pdf',          'application/pdf', 42),

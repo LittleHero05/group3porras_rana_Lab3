@@ -1,5 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using group3porras_rana_Lab3.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +9,18 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<LearningPortalContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("LearningPortal")));
 
+
+// NEW: cookie login
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";              // where to send users who aren't logged in
+        options.AccessDeniedPath = "/Account/AccessDenied"; // where to send students who try instructor pages
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);    // stay logged in for 8 hours
+    });
+
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -21,6 +33,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
