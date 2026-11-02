@@ -1,85 +1,95 @@
-using group3porras_rana_Lab3.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Amazon.DynamoDBv2;
+using Amazon.S3;
 using Amazon.SimpleSystemsManagement;
 using Amazon.SimpleSystemsManagement.Model;
+using group3porras_rana_Lab3.Models;
+using group3porras_rana_Lab3.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
 builder.Services.AddControllersWithViews();
-// AWS settings (profile + region) from appsettings
+
+// Keep the existing configuration-driven AWS authentication (local profile or EC2 role).
 var awsOptions = builder.Configuration.GetAWSOptions();
 builder.Services.AddDefaultAWSOptions(awsOptions);
+builder.Services.AddAWSService<IAmazonS3>();
+builder.Services.AddAWSService<IAmazonDynamoDB>();
+builder.Services.AddScoped<S3Service>();
+builder.Services.AddScoped<CommentService>();
 
-// Read DB credentials from AWS Systems Manager Parameter Store (SecureString)
 var parameterPath = builder.Configuration["ParameterPath"];
-string dbUser, dbPassword;
+if (string.IsNullOrWhiteSpace(parameterPath))
+    throw new InvalidOperationException("Set ParameterPath in configuration.");
 
 using (var ssm = awsOptions.CreateServiceClient<IAmazonSimpleSystemsManagement>())
 {
+    var names = new List<string> { $"{parameterPath}/DbUser", $"{parameterPath}/DbPassword" };
     var response = await ssm.GetParametersAsync(new GetParametersRequest
     {
-        Names = new List<string> { $"{parameterPath}/DbUser", $"{parameterPath}/DbPassword" },
-        WithDecryption = true   // decrypts the SecureString values
+        Names = names,
+        WithDecryption = true
     });
-
-    if (response.InvalidParameters?.Count > 0)
-        throw new InvalidOperationException(
-            "Missing parameters in Parameter Store: " + string.Join(", ", response.InvalidParameters));
+    if (response.InvalidParameters is { Count: > 0 })
+        throw new InvalidOperationException("Missing SSM parameters: " + string.Join(", ", response.InvalidParameters));
 
     var values = response.Parameters.ToDictionary(p => p.Name, p => p.Value);
-    dbUser = values[$"{parameterPath}/DbUser"];
-    dbPassword = values[$"{parameterPath}/DbPassword"];
+    if (!values.TryGetValue(names[0], out var dbUser) ||
+        !values.TryGetValue(names[1], out var dbPassword))
+        throw new InvalidOperationException("SSM did not return both database credentials.");
+
+    var server = builder.Configuration["Database:Server"];
+    var database = builder.Configuration["Database:Name"];
+    if (string.IsNullOrWhiteSpace(server) || string.IsNullOrWhiteSpace(database))
+        throw new InvalidOperationException("Set Database:Server and Database:Name.");
+
+    var connectionString = new SqlConnectionStringBuilder
+    {
+        DataSource = server,
+        InitialCatalog = database,
+        UserID = dbUser,
+        Password = dbPassword,
+        Encrypt = true,
+        TrustServerCertificate = builder.Environment.IsDevelopment()
+    }.ConnectionString;
+
+    builder.Services.AddDbContext<LearningPortalContext>(options =>
+        options.UseSqlServer(connectionString));
 }
 
-// Build the connection string from config + parameters (no password in any file)
-var connectionString = new SqlConnectionStringBuilder
-{
-    DataSource = builder.Configuration["Database:Server"],
-    InitialCatalog = builder.Configuration["Database:Name"],
-    UserID = dbUser,
-    Password = dbPassword,
-    TrustServerCertificate = true
-}.ConnectionString;
-
-builder.Services.AddDbContext<LearningPortalContext>(options =>
-    options.UseSqlServer(connectionString));
-
-
-// NEW: cookie login
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Account/Login";              // where to send users who aren't logged in
-        options.AccessDeniedPath = "/Account/AccessDenied"; // where to send students who try instructor pages
-        options.ExpireTimeSpan = TimeSpan.FromHours(8);    // stay logged in for 8 hours
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
     });
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
-
-
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+    // Elastic Beanstalk's reverse proxy supplies X-Forwarded-Proto.
+    // Configure known proxies/networks for production as appropriate.
+    app.UseForwardedHeaders(new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+    });
 }
 
-app.UseHttpsRedirection();
+// Beanstalk single-instance may start with HTTP only. Only redirect when HTTPS exists.
+if (app.Environment.IsDevelopment()) app.UseHttpsRedirection();
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapStaticAssets();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
-
 app.Run();

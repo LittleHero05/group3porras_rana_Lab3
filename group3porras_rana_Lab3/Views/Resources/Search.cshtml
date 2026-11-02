@@ -1,0 +1,9 @@
+@model IEnumerable<group3porras_rana_Lab3.Models.LearningResource>
+@{ ViewData["Title"] = "Search learning resources"; }
+<h1 class="mb-4">Search learning resources</h1>
+<form asp-action="Search" method="get" class="row g-3 mb-4">
+    <div class="col-md-5"><label class="form-label" for="topic">Title or topic</label><input id="topic" name="topic" value="@ViewBag.Topic" class="form-control" placeholder="e.g. cloud, testing, AWS"/></div>
+    <div class="col-md-5"><label class="form-label" for="author">Author or instructor</label><input id="author" name="author" value="@ViewBag.Author" class="form-control" placeholder="e.g. John, jsmith"/></div>
+    <div class="col-md-2 align-self-end"><button class="btn btn-primary w-100" type="submit">Search</button></div>
+</form>
+<partial name="_ResourceList" model="Model" />

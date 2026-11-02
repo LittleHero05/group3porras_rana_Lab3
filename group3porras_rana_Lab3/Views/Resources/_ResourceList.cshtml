@@ -1,0 +1,26 @@
+@model IEnumerable<group3porras_rana_Lab3.Models.LearningResource>
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No learning resources matched your request.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead><tr><th>Title</th><th>Category</th><th>Instructor</th><th>Created (UTC)</th><th>Views</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var resource in Model)
+            {
+                <tr>
+                    <td>@resource.Title</td>
+                    <td>@resource.Category.CategoryName</td>
+                    <td>@resource.Author.FirstName @resource.Author.LastName</td>
+                    <td>@resource.CreatedDate.ToString("yyyy-MM-dd")</td>
+                    <td>@resource.ViewCount</td>
+                    <td><a asp-action="Details" asp-route-id="@resource.ResourceId" class="btn btn-sm btn-outline-primary">View</a></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}

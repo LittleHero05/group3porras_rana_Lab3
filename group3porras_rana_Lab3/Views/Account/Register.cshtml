@@ -1,64 +1,17 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
 @model group3porras_rana_Lab3.ViewModels.RegisterViewModel
-@{
-    ViewData["Title"] = "Register";
-}
-
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
-        <h2 class="mb-4">Create an account</h2>
-        <form asp-action="Register" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            <div class="mb-3">
-                <label asp-for="Username" class="form-label"></label>
-                <input asp-for="Username" class="form-control" />
-                <span asp-validation-for="Username" class="text-danger"></span>
-            </div>
-            <div class="mb-3">
-                <label asp-for="Email" class="form-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="row">
-                <div class="col mb-3">
-                    <label asp-for="FirstName" class="form-label"></label>
-                    <input asp-for="FirstName" class="form-control" />
-                    <span asp-validation-for="FirstName" class="text-danger"></span>
-                </div>
-                <div class="col mb-3">
-                    <label asp-for="LastName" class="form-label"></label>
-                    <input asp-for="LastName" class="form-control" />
-                    <span asp-validation-for="LastName" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="mb-3">
-                <label asp-for="Password" class="form-label"></label>
-                <input asp-for="Password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-            <div class="mb-3">
-                <label asp-for="ConfirmPassword" class="form-label"></label>
-                <input asp-for="ConfirmPassword" class="form-control" />
-                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-            </div>
-            <div class="mb-3">
-                <label asp-for="Role" class="form-label">I am a</label>
-                <select asp-for="Role" class="form-select">
-                    <option value="Student">Student</option>
-                    <option value="Instructor">Instructor</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Register</button>
-        </form>
-        <p class="mt-3 text-center">Already have an account? <a asp-action="Login">Log in</a></p>
-    </div>
-</div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+@{ ViewData["Title"] = "Register"; }
+<div class="row justify-content-center"><div class="col-md-6 col-lg-5">
+<h1 class="h2 mb-4">Create a student account</h1>
+<form asp-action="Register" method="post">
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="mb-3"><label asp-for="Username" class="form-label"></label><input asp-for="Username" class="form-control"/><span asp-validation-for="Username" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control"/><span asp-validation-for="Email" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="FirstName" class="form-label"></label><input asp-for="FirstName" class="form-control"/><span asp-validation-for="FirstName" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="LastName" class="form-label"></label><input asp-for="LastName" class="form-control"/><span asp-validation-for="LastName" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="Password" class="form-label"></label><input asp-for="Password" class="form-control"/><span asp-validation-for="Password" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="ConfirmPassword" class="form-label"></label><input asp-for="ConfirmPassword" class="form-control"/><span asp-validation-for="ConfirmPassword" class="text-danger"></span></div>
+<input type="hidden" asp-for="Role" value="Student" />
+<button type="submit" class="btn btn-primary w-100">Register</button>
+</form><p class="mt-3 text-center">Already have an account? <a asp-action="Login">Log in</a></p>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
