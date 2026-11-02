@@ -1,0 +1,13 @@
+@model group3porras_rana_Lab3.ViewModels.ResourceFormViewModel
+@{ ViewData["Title"] = "Edit learning resource"; }
+<h1 class="mb-4">@ViewData["Title"]</h1>
+<form asp-action="Edit" asp-route-id="@Model.ResourceId" method="post" enctype="multipart/form-data" class="col-lg-7">
+    <input type="hidden" asp-for="ResourceId"/>
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-3"><label asp-for="Title" class="form-label"></label><input asp-for="Title" class="form-control"/><span asp-validation-for="Title" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="Description" class="form-label"></label><textarea asp-for="Description" class="form-control" rows="4"></textarea><span asp-validation-for="Description" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="CategoryId" class="form-label"></label><select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select"><option value="0">Choose a category</option></select><span asp-validation-for="CategoryId" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="File" class="form-label">Replace file (optional)</label><input asp-for="File" type="file" accept=".pdf,.png,.jpg,.jpeg,.pptx" class="form-control"/><small class="text-muted">Currently: @Model.CurrentFileName · Leave blank to keep existing file.</small><span asp-validation-for="File" class="text-danger d-block"></span></div>
+    <button type="submit" class="btn btn-primary">Save changes</button><a asp-action="Details" asp-route-id="@Model.ResourceId" class="btn btn-link">Cancel</a>
+</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

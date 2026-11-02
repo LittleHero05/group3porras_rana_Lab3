@@ -1,0 +1,9 @@
+@model group3porras_rana_Lab3.Models.LearningResource
+@{ ViewData["Title"] = "Delete learning resource"; }
+<h1>@ViewData["Title"]</h1>
+<div class="alert alert-warning">This permanently deletes the resource's SQL record, S3 file and related DynamoDB comments.</div>
+<p>Delete <strong>@Model.Title</strong>?</p>
+<form asp-action="Delete" asp-route-id="@Model.ResourceId" method="post">
+    <button type="submit" class="btn btn-danger">Confirm delete</button>
+    <a asp-action="Details" asp-route-id="@Model.ResourceId" class="btn btn-link">Cancel</a>
+</form>

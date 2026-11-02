@@ -1,8 +1,19 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@{ ViewData["Title"] = "Home"; }
+<div class="p-5 bg-light rounded-3 mb-4">
+    <h1 class="display-5 fw-bold">Learning Resource Portal</h1>
+    <p class="lead">Discover course materials, learn from instructors and discuss learning resources.</p>
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <a asp-controller="Resources" asp-action="Index" class="btn btn-primary btn-lg">Browse learning resources</a>
+    }
+    else
+    {
+        <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg">Log in</a>
+        <a asp-controller="Account" asp-action="Register" class="btn btn-outline-primary btn-lg">Register</a>
+    }
+</div>
+<div class="row g-3">
+  <div class="col-md-4"><div class="card h-100"><div class="card-body"><h2 class="h5">Organized resources</h2><p>Explore content by category, author and subject.</p></div></div></div>
+  <div class="col-md-4"><div class="card h-100"><div class="card-body"><h2 class="h5">Search and discover</h2><p>Find recent materials and popular instructor uploads.</p></div></div></div>
+  <div class="col-md-4"><div class="card h-100"><div class="card-body"><h2 class="h5">Discussion</h2><p>Share your thoughts and revise your own comments for 24 hours.</p></div></div></div>
 </div>

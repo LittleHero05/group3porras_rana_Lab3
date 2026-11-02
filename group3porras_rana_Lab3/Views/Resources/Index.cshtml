@@ -1,0 +1,10 @@
+@model IEnumerable<group3porras_rana_Lab3.Models.LearningResource>
+@{
+    var action = ViewContext.RouteData.Values["action"]?.ToString() ?? "Index";
+    ViewData["Title"] = action == "Popular" ? "Most popular" : action == "Recent" ? "Most recent" : "Learning resources";
+}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>@ViewData["Title"]</h1>
+    @if (User.IsInRole("Instructor")) { <a asp-action="Create" class="btn btn-primary">Add resource</a> }
+</div>
+<partial name="_ResourceList" model="Model" />
