@@ -32,6 +32,7 @@ using (var ssm = awsOptions.CreateServiceClient<IAmazonSimpleSystemsManagement>(
         Names = names,
         WithDecryption = true
     });
+
     if (response.InvalidParameters is { Count: > 0 })
         throw new InvalidOperationException("Missing SSM parameters: " + string.Join(", ", response.InvalidParameters));
 
@@ -52,7 +53,9 @@ using (var ssm = awsOptions.CreateServiceClient<IAmazonSimpleSystemsManagement>(
         UserID = dbUser,
         Password = dbPassword,
         Encrypt = true,
-        TrustServerCertificate = builder.Environment.IsDevelopment()
+        // Beanstalk's Linux server doesn't have the Amazon RDS CA installed,
+        // so certificate-chain validation fails. Traffic is still encrypted (Encrypt = true).
+        TrustServerCertificate = true
     }.ConnectionString;
 
     builder.Services.AddDbContext<LearningPortalContext>(options =>
@@ -72,6 +75,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -86,10 +90,12 @@ if (!app.Environment.IsDevelopment())
 
 // Beanstalk single-instance may start with HTTP only. Only redirect when HTTPS exists.
 if (app.Environment.IsDevelopment()) app.UseHttpsRedirection();
+
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapStaticAssets();
 app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
 app.Run();
